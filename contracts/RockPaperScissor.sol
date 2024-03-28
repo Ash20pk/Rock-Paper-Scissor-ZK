@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 contract RockPaperScissors {
@@ -9,7 +10,17 @@ contract RockPaperScissors {
     
     address public player1;
     address public player2;
-    
+
+    // Variables for ZK proof
+    struct ZKProof {
+        uint8 move;
+        uint256[2] a;
+        uint256[2] b;
+        uint256[2][2] c;
+    }
+
+    mapping(address => ZKProof) public proofs;
+
     event GameResult(address player1, address player2, Result result);
     
     constructor() {
@@ -19,6 +30,15 @@ contract RockPaperScissors {
     function joinGame() public {
         require(player2 == address(0), "Game is already full");
         player2 = msg.sender;
+    }
+    
+    function submitProof(
+        uint8 move,
+        uint256[2] memory a,
+        uint256[2] memory b,
+        uint256[2][2] memory c
+    ) public {
+        proofs[msg.sender] = ZKProof(move, a, b, c);
     }
     
     function playMove(uint8 move) public {
